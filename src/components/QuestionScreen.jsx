@@ -132,50 +132,69 @@ function DodgeTrail({ trails }) {
   );
 }
 
-// ─── NO Dodge Button — stays INSIDE the card ──────────────────
-function NoDodgeButton({ cardRef, onDodge }) {
+// ─── NO Dodge Button — stays strictly INSIDE the card ─────────
+function NoDodgeButton({ cardRef, onDodge, questionIndex }) {
   const btnRef  = useRef(null);
   const [pos, setPos] = useState(null);       // null = normal flow; {x,y} = absolute
   const [shaking, setShaking] = useState(false);
   const lastPosRef = useRef(null);
+
+  // Reset button to initial position when question changes
+  useEffect(() => {
+    setPos(null);
+    lastPosRef.current = null;
+  }, [questionIndex]);
 
   const getRandomPos = useCallback(() => {
     const card = cardRef.current;
     const btn  = btnRef.current;
     if (!card || !btn) return null;
 
-    const bw   = btn.offsetWidth  || BTN_W;
-    const bh   = btn.offsetHeight || BTN_H;
-    const maxX = card.offsetWidth  - bw - MARGIN;
-    const maxY = card.offsetHeight - bh - MARGIN;
+    const cardRect = card.getBoundingClientRect();
+    const btnRect  = btn.getBoundingClientRect();
 
-    for (let t = 0; t < 25; t++) {
-      const nx = clamp(MARGIN + Math.random() * (maxX - MARGIN), MARGIN, maxX);
-      const ny = clamp(MARGIN + Math.random() * (maxY - MARGIN), MARGIN, maxY);
+    const bw = btnRect.width || BTN_W;
+    const bh = btnRect.height || BTN_H;
 
-      // avoid same spot
+    // Use safe inner margins so rounded corners (32px) and shadows don't clip the button
+    const safeMarginX = 30;
+    const safeMarginTop = 60;   // below progress bar & badge
+    const safeMarginBottom = 30;
+
+    const minX = safeMarginX;
+    const maxX = Math.max(minX, cardRect.width - bw - safeMarginX);
+
+    const minY = safeMarginTop;
+    const maxY = Math.max(minY, cardRect.height - bh - safeMarginBottom);
+
+    for (let t = 0; t < 30; t++) {
+      const nx = clamp(minX + Math.random() * (maxX - minX), minX, maxX);
+      const ny = clamp(minY + Math.random() * (maxY - minY), minY, maxY);
+
+      // avoid jumping to the same or very close spot
       if (lastPosRef.current) {
         const dx = Math.abs(nx - lastPosRef.current.x);
         const dy = Math.abs(ny - lastPosRef.current.y);
-        if (dx < 90 && dy < 55) continue;
+        if (dx < 70 && dy < 40) continue;
       }
 
-      // avoid Yes button zone (center-bottom)
-      const yesCx = card.offsetWidth / 2;
-      const yesCy = card.offsetHeight - bh - MARGIN - 10;
-      if (Math.hypot(nx + bw / 2 - yesCx, ny + bh / 2 - yesCy) < 130) continue;
+      // avoid overlapping Yes button directly (center-lower area)
+      const yesCx = cardRect.width / 2;
+      const yesCy = cardRect.height - bh - 60;
+      if (Math.hypot(nx + bw / 2 - yesCx, ny + bh / 2 - yesCy) < 110) continue;
 
-      return { x: nx, y: ny };
+      return { x: Math.round(nx), y: Math.round(ny) };
     }
-    // safe fallback — top-right corner
-    return { x: maxX, y: MARGIN };
+
+    // fallback safe coordinates
+    return { x: maxX, y: minY };
   }, [cardRef]);
 
   const dodge = useCallback(() => {
     const newPos = getRandomPos();
     if (!newPos) return;
     lastPosRef.current = newPos;
-    setPos({ ...newPos });
+    setPos(newPos);
     setShaking(false);
     requestAnimationFrame(() => requestAnimationFrame(() => setShaking(true)));
     setTimeout(() => setShaking(false), 450);
@@ -188,7 +207,6 @@ function NoDodgeButton({ cardRef, onDodge }) {
   }
 
   const btnStyle = {
-    // Same gradient look as Yes — but purple/lavender instead of pink
     background: 'linear-gradient(135deg, #ce93d8, #f48fb1)',
     color: '#fff',
     fontFamily: "'Nunito', sans-serif",
@@ -200,7 +218,7 @@ function NoDodgeButton({ cardRef, onDodge }) {
     cursor: 'pointer',
     boxShadow: '0 6px 22px rgba(206,147,216,0.5)',
     whiteSpace: 'nowrap',
-    zIndex: 20,
+    zIndex: 25,
     animation: shaking
       ? 'noButtonEscape 0.4s cubic-bezier(0.22,1,0.36,1) both'
       : 'idleBounce 2.2s ease-in-out infinite',
@@ -209,7 +227,8 @@ function NoDodgeButton({ cardRef, onDodge }) {
           position: 'absolute',
           left: `${pos.x}px`,
           top: `${pos.y}px`,
-          transition: 'left 0.24s cubic-bezier(0.22,1,0.36,1), top 0.24s cubic-bezier(0.22,1,0.36,1)',
+          margin: 0,
+          transition: 'left 0.22s cubic-bezier(0.22,1,0.36,1), top 0.22s cubic-bezier(0.22,1,0.36,1)',
         }
       : {
           position: 'relative',
@@ -308,6 +327,15 @@ const S = {
     textShadow: '0 1px 8px rgba(233,30,99,0.08)',
     animation: 'fadeInUp 0.5s ease both',
   },
+  btnContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 'clamp(2rem, 5vw, 3.5rem)',
+    marginTop: '0.8rem',
+    width: '100%',
+    zIndex: 15,
+  },
   yesBtn: {
     position: 'relative',
     zIndex: 15,
@@ -322,8 +350,8 @@ const S = {
     cursor: 'pointer',
     boxShadow: '0 6px 24px rgba(233,30,99,0.44)',
     transition: 'transform 0.18s, box-shadow 0.18s',
-    display: 'block',
-    margin: '0 auto',
+    display: 'inline-block',
+    margin: '0',
     animation: 'idleBounce 2s ease-in-out 0.5s infinite',
     letterSpacing: '0.02em',
   },
@@ -461,26 +489,28 @@ export default function QuestionScreen({ questionIndex, total, onYes }) {
         {/* Buttons */}
         {!showResponse && (
           <>
-            <button
-              id={`yes-btn-q${questionIndex}`}
-              style={S.yesBtn}
-              onClick={handleYes}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px) scale(1.07)';
-                e.currentTarget.style.boxShadow = '0 14px 36px rgba(233,30,99,0.54)';
-                e.currentTarget.style.animation = 'none';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = '';
-                e.currentTarget.style.boxShadow = '0 6px 24px rgba(233,30,99,0.44)';
-                e.currentTarget.style.animation = 'idleBounce 2s ease-in-out 0.5s infinite';
-              }}
-              aria-label="Yes"
-            >
-              Yes ❤️
-            </button>
+            <div style={S.btnContainer}>
+              <button
+                id={`yes-btn-q${questionIndex}`}
+                style={S.yesBtn}
+                onClick={handleYes}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.07)';
+                  e.currentTarget.style.boxShadow = '0 14px 36px rgba(233,30,99,0.54)';
+                  e.currentTarget.style.animation = 'none';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.boxShadow = '0 6px 24px rgba(233,30,99,0.44)';
+                  e.currentTarget.style.animation = 'idleBounce 2s ease-in-out 0.5s infinite';
+                }}
+                aria-label="Yes"
+              >
+                Yes ❤️
+              </button>
 
-            <NoDodgeButton cardRef={cardRef} onDodge={handleDodge} />
+              <NoDodgeButton cardRef={cardRef} onDodge={handleDodge} questionIndex={questionIndex} />
+            </div>
           </>
         )}
 
