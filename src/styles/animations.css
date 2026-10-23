@@ -1,0 +1,206 @@
+/* ============================================================
+   Animations — Romantic Website
+   ============================================================ */
+
+/* ---------- Floating heart ---------- */
+@keyframes floatHeart {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  50%  { transform: translateY(-18px) scale(1.08); opacity: 0.85; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ---------- Pulse / beat ---------- */
+@keyframes heartBeat {
+  0%   { transform: scale(1); }
+  14%  { transform: scale(1.18); }
+  28%  { transform: scale(1); }
+  42%  { transform: scale(1.1); }
+  70%  { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Bounce entry ---------- */
+@keyframes bounceIn {
+  0%   { transform: scale(0.3); opacity: 0; }
+  50%  { transform: scale(1.08); opacity: 1; }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* ---------- Fade in up ---------- */
+@keyframes fadeInUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ---------- Fade in ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ---------- Fade out ---------- */
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ---------- Screen slide out left ---------- */
+@keyframes slideOutLeft {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-80px); opacity: 0; }
+}
+
+/* ---------- Screen slide in right ---------- */
+@keyframes slideInRight {
+  from { transform: translateX(80px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ---------- Confetti fall ---------- */
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ---------- Sparkle burst ---------- */
+@keyframes sparklePop {
+  0%   { transform: scale(0) rotate(0deg); opacity: 1; }
+  60%  { transform: scale(1.5) rotate(180deg); opacity: 0.8; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+/* ---------- Particle float up (yes burst) ---------- */
+@keyframes particleFloat {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx, 0px), var(--ty, -100px)) scale(0.3); opacity: 0; }
+}
+
+/* ---------- No button escape (spring-like) ---------- */
+@keyframes noButtonEscape {
+  0%   { transform: scale(1) rotate(0deg); }
+  20%  { transform: scale(0.82) rotate(-6deg); }
+  50%  { transform: scale(1.1) rotate(4deg); }
+  75%  { transform: scale(0.96) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ---------- No button scared shake ---------- */
+@keyframes scaredShake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  15%  { transform: translateX(-6px) rotate(-4deg); }
+  30%  { transform: translateX(6px) rotate(4deg); }
+  45%  { transform: translateX(-4px) rotate(-2deg); }
+  60%  { transform: translateX(4px) rotate(2deg); }
+  75%  { transform: translateX(-2px); }
+}
+
+/* ---------- Floating doodles (ambient scatter) ---------- */
+@keyframes driftAround {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  20%  { transform: translate(12px, -18px) rotate(12deg) scale(1.08); }
+  40%  { transform: translate(-10px, -30px) rotate(-8deg) scale(0.95); }
+  60%  { transform: translate(16px, -14px) rotate(10deg) scale(1.05); }
+  80%  { transform: translate(-8px, -22px) rotate(-5deg) scale(0.98); }
+  100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+}
+
+/* ---------- Rising particle stream ---------- */
+@keyframes riseUp {
+  0%   { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+  8%   { opacity: 1; }
+  50%  { transform: translateY(-45vh) translateX(var(--drift, 30px)) scale(1); opacity: 0.8; }
+  100% { transform: translateY(-100vh) translateX(calc(var(--drift, 30px) * 1.6)) scale(0.5); opacity: 0; }
+}
+
+/* ---------- Shine sweep (card glint stripe) ---------- */
+@keyframes shineSweep {
+  0%   { left: -100%; }
+  60%  { left: 150%; }
+  100% { left: 150%; }
+}
+
+/* ---------- Glow pulse ---------- */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 16px 4px rgba(244, 143, 177, 0.4); }
+  50%       { box-shadow: 0 0 36px 12px rgba(244, 143, 177, 0.7); }
+}
+
+/* ---------- Border glow rotate ---------- */
+@keyframes borderGlow {
+  0%   { box-shadow: 0 0 0 2px rgba(233,30,99,0.3), 0 20px 72px rgba(233,30,99,0.2); }
+  50%  { box-shadow: 0 0 0 4px rgba(233,30,99,0.55), 0 20px 72px rgba(233,30,99,0.35); }
+  100% { box-shadow: 0 0 0 2px rgba(233,30,99,0.3), 0 20px 72px rgba(233,30,99,0.2); }
+}
+
+/* ---------- Celebration heart grow ---------- */
+@keyframes celebHeartGrow {
+  0%   { transform: scale(0) rotate(-15deg); opacity: 0; }
+  60%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+  80%  { transform: scale(0.95) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ---------- Hug message ---------- */
+@keyframes hugPop {
+  0%   { transform: scale(0.4); opacity: 0; }
+  70%  { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ---------- Wiggle ---------- */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(8deg); }
+  60% { transform: rotate(-5deg); }
+  80% { transform: rotate(5deg); }
+}
+
+/* ---------- Sparkle twinkle ---------- */
+@keyframes twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  25%  { transform: scale(1.4) rotate(30deg); opacity: 1; }
+  50%  { transform: scale(0.7) rotate(60deg); opacity: 0.5; }
+  75%  { transform: scale(1.2) rotate(90deg); opacity: 1; }
+}
+
+/* ---------- Card breathe (subtle scale pulse) ---------- */
+@keyframes cardBreathe {
+  0%, 100% { transform: scale(1); }
+  50%  { transform: scale(1.012); }
+}
+
+/* ---------- Gradient shift ---------- */
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ---------- Orbit spin (decorative ring) ---------- */
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+/* ---------- Text shimmer ---------- */
+@keyframes textShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ---------- Bounce bounce (button idle) ---------- */
+@keyframes idleBounce {
+  0%, 100% { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
