@@ -75,6 +75,8 @@ const S = {
     transformOrigin: '0 0',
   },
   heading: {
+    position: 'relative',
+    zIndex: 5,
     fontFamily: "'Dancing Script', cursive",
     fontSize: 'clamp(2.3rem, 6vw, 3.8rem)',
     color: '#e91e63',
@@ -89,6 +91,8 @@ const S = {
     animation: 'textShimmer 4s linear infinite',
   },
   subtitle: {
+    position: 'relative',
+    zIndex: 5,
     fontFamily: "'Nunito', sans-serif",
     fontSize: 'clamp(1rem, 2.8vw, 1.22rem)',
     color: '#7b3f6e',

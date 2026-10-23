@@ -39,7 +39,7 @@ function SparkleRing() {
   return (
     <div
       aria-hidden="true"
-      style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1 }}
+      style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}
     >
       {sparks.map((s) => (
         <span
@@ -48,9 +48,10 @@ function SparkleRing() {
             position: 'absolute',
             top: '50%',
             left: '50%',
-            fontSize: '1.1rem',
+            fontSize: '1rem',
+            opacity: 0.7,
             animation: `twinkle ${2 + s.id * 0.3}s ease-in-out ${s.delay}s infinite`,
-            transform: `rotate(${s.angle}deg) translateX(${105 + (s.id % 3) * 18}px)`,
+            transform: `rotate(${s.angle}deg) translateX(${160 + (s.id % 3) * 20}px)`,
             transformOrigin: '0 0',
             marginTop: '-0.5rem',
             marginLeft: '-0.5rem',
@@ -109,7 +110,7 @@ function YesBurst({ active }) {
 // ─── Mini heart trail from No button when it dodges ───────────
 function DodgeTrail({ trails }) {
   return (
-    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 60 }}>
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2 }}>
       {trails.map((t) => (
         <span
           key={t.id}
@@ -132,8 +133,8 @@ function DodgeTrail({ trails }) {
   );
 }
 
-// ─── NO Dodge Button — stays strictly INSIDE the card ─────────
-function NoDodgeButton({ cardRef, onDodge, questionIndex }) {
+// ─── NO Dodge Button — stays strictly INSIDE the card and off text ─────
+function NoDodgeButton({ cardRef, textRef, onDodge, questionIndex }) {
   const btnRef  = useRef(null);
   const [pos, setPos] = useState(null);       // null = normal flow; {x,y} = absolute
   const [shaking, setShaking] = useState(false);
@@ -156,9 +157,9 @@ function NoDodgeButton({ cardRef, onDodge, questionIndex }) {
     const bw = btnRect.width || BTN_W;
     const bh = btnRect.height || BTN_H;
 
-    // Use safe inner margins so rounded corners (32px) and shadows don't clip the button
+    // Boundary margins
     const safeMarginX = 30;
-    const safeMarginTop = 60;   // below progress bar & badge
+    const safeMarginTop = 60;
     const safeMarginBottom = 30;
 
     const minX = safeMarginX;
@@ -167,18 +168,37 @@ function NoDodgeButton({ cardRef, onDodge, questionIndex }) {
     const minY = safeMarginTop;
     const maxY = Math.max(minY, cardRect.height - bh - safeMarginBottom);
 
-    for (let t = 0; t < 30; t++) {
+    // Question text collision box relative to card
+    let textZone = null;
+    if (textRef && textRef.current) {
+      const tr = textRef.current.getBoundingClientRect();
+      textZone = {
+        left: tr.left - cardRect.left - 15,
+        right: tr.right - cardRect.left + 15,
+        top: tr.top - cardRect.top - 15,
+        bottom: tr.bottom - cardRect.top + 15,
+      };
+    }
+
+    for (let t = 0; t < 40; t++) {
       const nx = clamp(minX + Math.random() * (maxX - minX), minX, maxX);
       const ny = clamp(minY + Math.random() * (maxY - minY), minY, maxY);
 
-      // avoid jumping to the same or very close spot
+      // 1. Avoid overlapping question text
+      if (textZone) {
+        const overlapsX = nx + bw > textZone.left && nx < textZone.right;
+        const overlapsY = ny + bh > textZone.top && ny < textZone.bottom;
+        if (overlapsX && overlapsY) continue;
+      }
+
+      // 2. Avoid jumping to identical spot
       if (lastPosRef.current) {
         const dx = Math.abs(nx - lastPosRef.current.x);
         const dy = Math.abs(ny - lastPosRef.current.y);
         if (dx < 70 && dy < 40) continue;
       }
 
-      // avoid overlapping Yes button directly (center-lower area)
+      // 3. Avoid overlapping Yes button directly (center-lower area)
       const yesCx = cardRect.width / 2;
       const yesCy = cardRect.height - bh - 60;
       if (Math.hypot(nx + bw / 2 - yesCx, ny + bh / 2 - yesCy) < 110) continue;
@@ -186,9 +206,9 @@ function NoDodgeButton({ cardRef, onDodge, questionIndex }) {
       return { x: Math.round(nx), y: Math.round(ny) };
     }
 
-    // fallback safe coordinates
-    return { x: maxX, y: minY };
-  }, [cardRef]);
+    // fallback safe coordinates (bottom area away from text)
+    return { x: maxX, y: maxY };
+  }, [cardRef, textRef]);
 
   const dodge = useCallback(() => {
     const newPos = getRandomPos();
@@ -296,6 +316,8 @@ const S = {
   },
   counterBadge: {
     display: 'inline-block',
+    position: 'relative',
+    zIndex: 10,
     background: 'linear-gradient(135deg, #fce4ec, #f3e5f5)',
     color: '#e91e63',
     fontFamily: "'Nunito', sans-serif",
@@ -309,12 +331,16 @@ const S = {
     boxShadow: '0 2px 10px rgba(233,30,99,0.1)',
   },
   decoRow: {
+    position: 'relative',
+    zIndex: 10,
     fontSize: '1.7rem',
     letterSpacing: '0.5rem',
     marginBottom: '1.2rem',
     opacity: 0.8,
   },
   question: {
+    position: 'relative',
+    zIndex: 10,
     fontFamily: "'Dancing Script', cursive",
     fontSize: 'clamp(1.65rem, 4.5vw, 2.3rem)',
     color: '#4a2040',
@@ -392,6 +418,7 @@ const S = {
 // ─── QuestionScreen ───────────────────────────────────────────
 export default function QuestionScreen({ questionIndex, total, onYes }) {
   const cardRef          = useRef(null);
+  const textRef          = useRef(null);
   const [showResponse, setShowResponse] = useState(false);
   const [burst,        setBurst]        = useState(false);
   const [answered,     setAnswered]     = useState(false);
@@ -453,9 +480,6 @@ export default function QuestionScreen({ questionIndex, total, onYes }) {
           />
         </div>
 
-        {/* Sparkle ring decorations */}
-        <SparkleRing />
-
         {/* Dodge message */}
         {dodgeMsg && (
           <div style={S.dodgeMsg} aria-live="polite">{dodgeMsg}</div>
@@ -482,7 +506,7 @@ export default function QuestionScreen({ questionIndex, total, onYes }) {
         </div>
 
         {/* Question text */}
-        <div style={{ ...S.question, key: questionIndex }}>
+        <div ref={textRef} style={{ ...S.question, key: questionIndex }}>
           {qData.question}
         </div>
 
@@ -509,7 +533,12 @@ export default function QuestionScreen({ questionIndex, total, onYes }) {
                 Yes ❤️
               </button>
 
-              <NoDodgeButton cardRef={cardRef} onDodge={handleDodge} questionIndex={questionIndex} />
+              <NoDodgeButton
+                cardRef={cardRef}
+                textRef={textRef}
+                onDodge={handleDodge}
+                questionIndex={questionIndex}
+              />
             </div>
           </>
         )}
